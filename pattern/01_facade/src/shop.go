@@ -1,4 +1,4 @@
-package scr
+package src
 
 import (
 	"errors"

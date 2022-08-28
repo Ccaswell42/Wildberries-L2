@@ -1,4 +1,4 @@
-package scr
+package src
 
 // переменные для примера работы магазина
 var (

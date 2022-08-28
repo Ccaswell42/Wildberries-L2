@@ -1,7 +1,7 @@
 package main
 
 import (
-	"facade/scr"
+	"facade/src"
 	"fmt"
 )
 
@@ -29,7 +29,7 @@ Facade(). Наш магазин будет проверять баланс кл�
 */
 
 func main() {
-	err := scr.Facade("Moscow", "Apple", "Dmitriy", 150000)
+	err := src.Facade("Moscow", "Apple", "Dmitriy", 150000)
 	if err != nil {
 		fmt.Println(err)
 		return

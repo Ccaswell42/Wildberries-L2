@@ -1,4 +1,4 @@
-package scr
+package src
 
 // Структура User имеет карту, город, и имя
 type User struct {
