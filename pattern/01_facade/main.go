@@ -29,10 +29,26 @@ Facade(). Наш магазин будет проверять баланс кл�
 */
 
 func main() {
-	err := src.Facade("Moscow", "Apple", "Dmitriy", 150000)
+	facade := src.NewFacade("Kazan", "Dmitriy", 130000)
+
+	err := facade.Sell("Samsung")
+
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	err = facade.Sell("Dyson")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = facade.Sell("Samsung")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

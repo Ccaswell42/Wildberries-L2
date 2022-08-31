@@ -23,11 +23,11 @@ func (shop *Shop) SetProductsDB() {
 }
 
 // Конструируем наш магазин сразу с товарами и базой городов
-func NewShop() *Shop {
+func NewShop() Shop {
 	var shop Shop
 	shop.SetProductsDB()
 	shop.SetCityDeliverDB()
-	return &shop
+	return shop
 }
 
 // Основная функция магазина - продажа товара.
@@ -75,12 +75,23 @@ func (shop Shop) Sell(user User, product string) error {
 // наш фасад, принимает город доставки, необходимы товар, имя заказчика и количество денег на счету заказчика
 // из полученных данных конструируем нужные объекты и реализуем работу наешго магазина.
 
-func Facade(city, product, name string, money int) error {
+func NewFacade(city, name string, money int) *Facade {
 	card := NewCard(money)
 	newCity := NewCity(city)
 	user := NewUser(card, newCity, name)
 	shop := NewShop()
-	err := shop.Sell(user, product)
+	return &Facade{
+		user, shop,
+	}
+}
+
+type Facade struct {
+	User User
+	Shop Shop
+}
+
+func (s *Facade) Sell(product string) error {
+	err := s.Shop.Sell(s.User, product)
 	if err != nil {
 		return err
 	}
