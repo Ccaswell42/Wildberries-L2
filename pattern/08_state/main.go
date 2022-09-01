@@ -1,7 +1,7 @@
-package pattern
+package _8_state
 
 /*
-	Реализовать паттерн «стратегия».
+	Реализовать паттерн «состояние».
 Объяснить применимость паттерна, его плюсы и минусы, а также реальные примеры использования данного примера на практике.
-	https://en.wikipedia.org/wiki/Strategy_pattern
+	https://en.wikipedia.org/wiki/State_pattern
 */
