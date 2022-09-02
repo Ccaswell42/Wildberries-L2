@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"state/src"
 )
 
@@ -12,15 +11,26 @@ import (
 */
 
 func main() {
-	bob := src.NewGamer(5000)
-	fmt.Println(bob.PrintResult())
-	//win := src.Win{Gamer: bob}
+	bob := src.NewGamer(10000)
+	bob.PrintResult()
+	win := src.Win{Gamer: bob}
 	lose := src.Loose{Gamer: bob}
-	//draw := src.Draw{Gamer: bob}
-	c := lose.PrintResult()
-	fmt.Println(c)
-	c = lose.PrintResult()
-	fmt.Println(c)
+	draw := src.Draw{Gamer: bob}
 
-	fmt.Println(bob.PrintResult())
+	bob.SetState(&win)
+	bob.Roll()
+	bob.PrintResult()
+	bob.SetState(&win)
+	bob.Roll()
+	bob.PrintResult()
+	bob.SetState(&draw)
+	bob.Roll()
+	bob.PrintResult()
+	bob.SetState(&lose)
+	bob.Roll()
+	bob.PrintResult()
+	bob.SetState(&lose)
+	bob.Roll()
+	bob.PrintResult()
+
 }

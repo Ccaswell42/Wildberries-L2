@@ -1,7 +1,8 @@
 package src
 
 type State interface {
-	PrintResult() string
+	PrintResult()
+	Roll()
 }
 
 type Gamer struct {
@@ -23,7 +24,11 @@ func (g *Gamer) SetState(st State) {
 	g.State = st
 }
 
-func (g *Gamer) PrintResult() string {
-	return g.State.PrintResult()
+func (g *Gamer) Roll() {
+	g.State.Roll()
+}
+
+func (g *Gamer) PrintResult() {
+	g.State.PrintResult()
 
 }

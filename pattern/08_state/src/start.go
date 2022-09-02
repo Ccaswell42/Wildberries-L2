@@ -6,8 +6,9 @@ type Start struct {
 	Gamer *Gamer
 }
 
-func (s *Start) PrintResult() string {
+func (s *Start) Roll() {
 	s.Gamer.SetState(s)
-
-	return fmt.Sprintf("[СТАРТ ИГРЫ], на счету: %d, размер ставки: %d\n", s.Gamer.Cash, s.Gamer.Bet)
+}
+func (s *Start) PrintResult() {
+	fmt.Printf("[СТАРТ ИГРЫ], на счету: %d, размер ставки: %d\n", s.Gamer.Cash, s.Gamer.Bet)
 }
