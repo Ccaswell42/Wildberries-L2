@@ -1,5 +1,14 @@
 package main
 
+import (
+	"errors"
+	"fmt"
+	"log"
+	"strconv"
+	"strings"
+	"unicode"
+)
+
 /*
 === Задача на распаковку ===
 
@@ -18,6 +27,45 @@ package main
 Функция должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
-func main() {
+func UnpackString(str string) (string, error) {
+	arr := []rune(str) //кастуем строку к срезу рун
+	var mid string
+	var res string
+	if len(str) == 0 { // проверка на пустую строку
+		return "", nil
+	}
+	if unicode.IsDigit(arr[0]) { // проверка, что первый символ не цифра
+		return "", errors.New("некорректная строка")
+	}
+	for i, val := range arr {
+		// если попадается цифра, преобразуем нашу строку соответствующим образом
+		if unicode.IsDigit(val) {
+			if val == '0' { // если попадается 0 - игнорируем его
+				continue
+			}
+			if i != len(arr)-1 && unicode.IsDigit(arr[i+1]) { // если две цифры идут подряд - ошибка
+				return "", errors.New("некорректная строка")
+			}
+			// кастуем цифру к типу int
+			amount, err := strconv.Atoi(string(arr[i]))
+			if err != nil {
+				return "", err
+			}
+			// преобразуем строку c помощью функции Repeat
+			mid = strings.Repeat(string(arr[i-1]), amount-1)
+			res += mid
+			continue
+		}
+		res += string(val)
+	}
 
+	return res, nil
+}
+
+func main() {
+	str, err := UnpackString("ф0")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(str)
 }
