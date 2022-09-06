@@ -46,6 +46,7 @@ import (
 
 type NumString struct {
 	Index int
+	Num   int
 	Str   string
 }
 
@@ -58,10 +59,10 @@ func CheckRepeat(arr []string, str string) bool {
 	return false
 }
 
-func GetNumeric(arr []string) ([]int, error) {
+func GetNumeric(arr []string) ([]NumString, error) {
 
-	var num []int
 	var n string
+	var numstr []NumString
 
 	for _, val := range arr {
 		s := []rune(val)
@@ -73,43 +74,58 @@ func GetNumeric(arr []string) ([]int, error) {
 			if err != nil {
 				return nil, err
 			}
-			num = append(num, g)
+			numstr = append(numstr, NumString{Index: -1, Num: g, Str: string(s)})
+
 			n = ""
 		}
 	}
-	sort.Ints(num)
-	return num, nil
+	return numstr, nil
 }
 
-func HasPrefix(ful string, num []int) (bool, int) {
-	for i, val := range num {
-		str := strconv.Itoa(val)
+func HasPrefix(ful string, numstr []NumString) bool {
+
+	for _, val := range numstr {
+
+		str := strconv.Itoa(val.Num)
 		if strings.HasPrefix(ful, str) {
-			return true, i
+			return true
 		}
 	}
-	return false, -1
+
+	return false
 }
 
-func GetTail(numstr []NumString) string {
+func Bubblesort(numstr []NumString) []string {
+	var arr []string
+	for i := 0; i < len(numstr)-1; i++ {
+		for j := len(numstr) - 1; j > i; j-- {
+			if numstr[j-1].Num > numstr[j].Num {
+				tempNum := numstr[j].Num
+				tempStr := numstr[j].Str
+				numstr[j].Num = numstr[j-1].Num
+				numstr[j].Str = numstr[j-1].Str
+				numstr[j-1].Num = tempNum
+				numstr[j-1].Str = tempStr
+			}
+		}
+	}
 
+	for _, val := range numstr {
+		//fmt.Println(val.Str, val.Num)
+		arr = append(arr, val.Str)
+	}
+	return arr
 }
-func SortNumeric(num []int, arr []string) []string {
+
+func SortNumeric(numstr []NumString, arr []string) []string {
 	var new []string
 	var tail []string
-	var numstr []NumString
 	for _, val := range arr {
-		t, n := HasPrefix(val, num)
-		if t {
-			numstr = append(numstr, NumString{n, val})
-		} else {
+		if !HasPrefix(val, numstr) {
 			new = append(new, val)
 		}
 	}
-	a := 0
-	for i := 0; i < len(numstr); i++ {
-
-	}
+	tail = Bubblesort(numstr)
 
 	new = append(new, tail...)
 	return new
@@ -154,5 +170,5 @@ func main() {
 		fmt.Println(val)
 	}
 
-	GetNumeric(arr)
+	//GetNumeric(arr)
 }
