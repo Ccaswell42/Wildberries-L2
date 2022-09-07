@@ -37,19 +37,19 @@ import (
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
-/*
-	a := flag.Int("a", 0, "вспомогательное сообщение для a")
-	b := flag.String("b", "lol", "вспомогательное сообщение для b")
-	flag.Parse()
-	fmt.Println(*a, *b)
-*/
-
+// NumString - структура для работы с флагом -n
 type NumString struct {
-	Index int
-	Num   int
-	Str   string
+	Num int
+	Str string
 }
 
+// ColumnString - структура для работы с флагом -k
+type ColumnString struct {
+	Substr  string
+	FullStr string
+}
+
+// CheckRepeat - проферяет есть ли данная строка в массиве строк
 func CheckRepeat(arr []string, str string) bool {
 	for _, val := range arr {
 		if val == str {
@@ -59,6 +59,7 @@ func CheckRepeat(arr []string, str string) bool {
 	return false
 }
 
+// GetNumeric подгатавливает массив строк для последующий сортировки с учетом числового значения
 func GetNumeric(arr []string) ([]NumString, error) {
 
 	var n string
@@ -74,7 +75,7 @@ func GetNumeric(arr []string) ([]NumString, error) {
 			if err != nil {
 				return nil, err
 			}
-			numstr = append(numstr, NumString{Index: -1, Num: g, Str: string(s)})
+			numstr = append(numstr, NumString{Num: g, Str: string(s)})
 
 			n = ""
 		}
@@ -82,6 +83,7 @@ func GetNumeric(arr []string) ([]NumString, error) {
 	return numstr, nil
 }
 
+// HasPrefix проверяет на наличие у строки префикса в виде определенной строки
 func HasPrefix(ful string, numstr []NumString) bool {
 
 	for _, val := range numstr {
@@ -95,23 +97,19 @@ func HasPrefix(ful string, numstr []NumString) bool {
 	return false
 }
 
+// Bubblesort сортирует массив структур по числовому значению методом пузырька и возвращает готовый
+// отсортированный массив строк
 func Bubblesort(numstr []NumString) []string {
 	var arr []string
 	for i := 0; i < len(numstr)-1; i++ {
 		for j := len(numstr) - 1; j > i; j-- {
 			if numstr[j-1].Num > numstr[j].Num {
-				tempNum := numstr[j].Num
-				tempStr := numstr[j].Str
-				numstr[j].Num = numstr[j-1].Num
-				numstr[j].Str = numstr[j-1].Str
-				numstr[j-1].Num = tempNum
-				numstr[j-1].Str = tempStr
+				numstr[j].Num, numstr[j-1].Num = numstr[j-1].Num, numstr[j].Num
+				numstr[j].Str, numstr[j-1].Str = numstr[j-1].Str, numstr[j].Str
 			}
 		}
 	}
-
 	for _, val := range numstr {
-		//fmt.Println(val.Str, val.Num)
 		arr = append(arr, val.Str)
 	}
 	return arr
@@ -131,21 +129,65 @@ func SortNumeric(numstr []NumString, arr []string) []string {
 	return new
 }
 
+// PrepareColumn - подготавливает массив строк с колонками для последующей сортировки
+func PrepareColumn(arr []string, k int) ([]string, []ColumnString) {
+	var columnStr []ColumnString
+	var sortArr []string
+	var newstr []string
+
+	for _, val := range arr {
+		newstr = strings.Split(val, " ")
+		if k >= len(newstr) {
+			log.Fatal("sort: -k: Invalid argument")
+		}
+		sortArr = append(sortArr, newstr[k])
+		columnStr = append(columnStr, ColumnString{FullStr: val, Substr: newstr[k]})
+	}
+	sort.Strings(sortArr)
+	return sortArr, columnStr
+}
+
+// SearchStr - ищет соответствующую подстроку в массиве структур Columnstring, и возвращает полную строку, содержащую ее
+func SearchStr(str string, columnStr []ColumnString) string {
+	for _, val := range columnStr {
+		if str == val.Substr {
+			return val.FullStr
+		}
+	}
+	return ""
+}
+
+// SortColumn - сортирует массив строк с колонками соотвествующим образом, и возвращает отсортированный массив.
+func SortColumn(sortArr []string, columnStr []ColumnString) []string {
+	var resStr []string
+	for _, val := range sortArr {
+		fullStr := SearchStr(val, columnStr)
+		resStr = append(resStr, fullStr)
+	}
+	return resStr
+}
+
 func main() {
-	file, err := os.Open("stroki")
+	// открывае файл указанный в аргумента
+	file, err := os.Open(os.Args[len(os.Args)-1])
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
+	// объвляем массив, куда построчно почитаем данные из файла
 	var arr []string
 
-	u := flag.Bool("u", false, "неправильное использование флага")
-	r := flag.Bool("r", false, "неправильное использование флага")
-	n := flag.Bool("n", false, "неправильное использование флага")
+	// объявляем флаги
+	u := flag.Bool("u", false, "sort: -u: Invalid argument")
+	r := flag.Bool("r", false, "sort: -r: Invalid argument")
+	n := flag.Bool("n", false, "sort: -n: Invalid argument")
+	k := flag.Int("k", 0, "sort: -k: Invalid argument")
 	flag.Parse()
 
+	// читаем из файла в наш массив
 	s := bufio.NewScanner(file)
 	for s.Scan() {
+		// обрабатываем флаг "-u"
 		if *u {
 			if CheckRepeat(arr, s.Text()) {
 				continue
@@ -155,20 +197,28 @@ func main() {
 		arr = append(arr, s.Text())
 	}
 
-	sort.Strings(arr)
+	// обрабатываем флаг "-n"
 	if *n {
+		sort.Strings(arr)
 		num, err := GetNumeric(arr)
 		if err != nil {
 			log.Fatal(err)
 		}
 		arr = SortNumeric(num, arr)
 	}
+	// обрабатываем флаг "-r"
 	if *r {
 		sort.Sort(sort.Reverse(sort.StringSlice(arr)))
 	}
+	// обрабатываем флаг "-k"
+	if *k > 0 {
+		sortArr, columnstr := PrepareColumn(arr, *k-1)
+		arr = SortColumn(sortArr, columnstr)
+
+	}
+	// выводим результат в консоль
 	for _, val := range arr {
 		fmt.Println(val)
 	}
 
-	//GetNumeric(arr)
 }
